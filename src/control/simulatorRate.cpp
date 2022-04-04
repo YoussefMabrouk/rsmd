@@ -40,14 +40,19 @@ void SimulatorRate::setup(const Parameters& parameters)
 //
 void SimulatorRate::reactiveStep()
 {
-    std::size_t nReactionsAttempted {0};
-    std::size_t nReactionsAccepted {0};
+    std::vector<int> nReactionsAttempted(8, 0);
+    std::vector<int> nReactionsAccepted(8, 0);
+    std::stringstream accepted_string;
+    std::stringstream attempted_string;
+    int ntotalaccepted = 0;
+    int ntotalattempted = 0;
+    int i;
     std::vector<ReactionCandidate> acceptedCandidates {};
     std::unordered_map<std::string, int> candidateTypes {};
 
     // search for candidates
-    universe.update(lastReactiveCycle);              
-    auto candidates = universe.searchReactionCandidates();  // returns shuffled vector of reaction candidates
+    universe.update(lastReactiveCycle);
+    auto candidates = universe.CellSearchReactionCandidates(); //searchReactionCandidates();  // returns shuffled vector of reaction candidates
     STATISTICS_FILE << std::setw(10) << currentCycle << std::setw(15) << candidates.size();
     if( candidates.size() > 0 )
     {
@@ -57,13 +62,25 @@ void SimulatorRate::reactiveStep()
         {
             if( universe.isAvailable(candidate) )
             {
-                ++ nReactionsAttempted;
+                for (i=0; i<universe.getReactionTemplates().size(); i++)
+                {
+                    if (candidate.reaction_name()==universe.getReactionTemplates()[i].getName())
+                    {
+                        ++ nReactionsAttempted[i];
+                    }
+                }
                 if( acceptance(candidate) )
                 {
                     universe.react(candidate);
                     acceptedCandidates.push_back(candidate);
-                    ++ nReactionsAccepted;
                     rsmdLOG( "... reacted candidate " << candidate.shortInfo() );
+                    for (i=0; i<universe.getReactionTemplates().size(); i++)
+                    {
+                        if (candidate.reaction_name() == universe.getReactionTemplates()[i].getName())
+                        {
+                            ++ nReactionsAccepted[i];
+                        }
+                    }
                 }
             }
             else
@@ -72,14 +89,23 @@ void SimulatorRate::reactiveStep()
             }
             candidateTypes.try_emplace( candidate.getName(), 0 );
             candidateTypes[candidate.getName()] += 1;
-        }        
-        STATISTICS_FILE << std::setw(15) << nReactionsAccepted << std::setw(15) << nReactionsAttempted;
-
+        }     
+        
+        for(std::vector<int>::iterator it = nReactionsAccepted.begin(); it != nReactionsAccepted.end(); ++it)
+        ntotalaccepted += *it;
+        for(std::vector<int>::iterator it = nReactionsAttempted.begin(); it != nReactionsAttempted.end(); ++it)
+        ntotalattempted += *it;
+        
+        std::copy(nReactionsAccepted.begin(), nReactionsAccepted.end(), std::ostream_iterator<int>(accepted_string, " "));  
+        std::copy(nReactionsAttempted.begin(), nReactionsAttempted.end(), std::ostream_iterator<int>(attempted_string, " "));
+        
+        STATISTICS_FILE << std::setw(50) << accepted_string.str().c_str() << std::setw(50) << attempted_string.str().c_str();
+        
         // relaxation
-        if( nReactionsAccepted > 0 )
+        if( ntotalaccepted > 0 )
         {
             universe.write(currentCycle);
-            rsmdLOG( "... reacted " << nReactionsAccepted << " out of " << nReactionsAttempted << " available candidates (out of " << candidates.size() << " candidates)" );
+            rsmdLOG( "... reacted " << ntotalaccepted << " out of " << ntotalattempted << " available candidates (out of " << candidates.size() << " candidates)" );
             rsmdLOG( "... candidates were: ")
             for( const auto& pair : candidateTypes) 
             {

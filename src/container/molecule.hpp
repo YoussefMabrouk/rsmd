@@ -51,6 +51,7 @@ class Molecule
     // atom getters
     //
     const Atom& getAtom(std::size_t id) const;
+    //const Atom& getFirstAtom(std::size_t id) const;
    
     //
     // remove atoms from this molecule

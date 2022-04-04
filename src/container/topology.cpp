@@ -10,6 +10,9 @@
 */
 
 #include "container/topology.hpp"
+#include <iostream>
+#include <math.h>      
+using namespace std;
 
 //
 // get reaction record for specific molecule
@@ -43,6 +46,82 @@ std::vector<std::reference_wrapper<Molecule>> Topology::getMolecules(std::string
     return molReferences;
 }
 
+
+int Topology::heaviside(int i )
+{
+   if (i>0) 
+   {
+     return 1;
+   }
+   else 
+   {
+     return 0;
+   }
+}
+int Topology::right( int n)
+{ 
+    return (n+1)*heaviside(CellNumbers[0]-1-n);
+}
+int Topology::left( int n)
+{
+    return (n-1)*heaviside(n) + (CellNumbers[0]-1)*heaviside(1-n);
+}
+int Topology::up( int n)
+{
+    return (n+1)*heaviside(CellNumbers[2]-1-n);
+}
+int Topology::down( int n)
+{
+    return (n-1)*heaviside(n) + (CellNumbers[2]-1)*heaviside(1-n);
+}  
+ 
+//3-d cell list
+std::tuple<std::vector<std::vector<std::reference_wrapper<Molecule>>>, std::vector<std::vector<int>>> Topology::getCellList()
+{
+    std::vector<std::reference_wrapper<Molecule>> List {};
+    std::vector<int> IndexList {};
+    std::vector<std::vector<std::reference_wrapper<Molecule>>> CellList {};
+    std::vector<std::vector<int>> CellNeighbourIndices {};
+    Molecule molecule;
+    int i, j, k, Index, NeighbourIndex;
+    int n_x, n_y, n_z;
+    for(i = 0 ; i < CellNumbers[0]*CellNumbers[1]*CellNumbers[2];i++)
+    {
+        CellList.emplace_back(List);
+        CellNeighbourIndices.emplace_back(IndexList);
+    }
+    for(auto it = begin(); it != end(); it++ )
+    {
+        molecule = *it;
+        n_x = floor((molecule[0].position(0)/dimensions[0]-floor(molecule[0].position(0)/dimensions[0]))*CellNumbers[0]);
+        n_y = floor((molecule[0].position(1)/dimensions[1]-floor(molecule[0].position(1)/dimensions[1]))*CellNumbers[1]);
+        n_z = floor((molecule[0].position(2)/dimensions[2]-floor(molecule[0].position(2)/dimensions[2]))*CellNumbers[2]); 
+        Index =  n_x + n_y*CellNumbers[0] + n_z*CellNumbers[0]*CellNumbers[1];
+        CellList[Index].emplace_back( *it );
+    }
+    for (k = 0; k<CellNumbers[2]; k++)
+    {
+        for (j = 0; j<CellNumbers[1]; j++)
+        {
+            for (i = 0; i<CellNumbers[0]; i++)
+            {
+                for ( auto n_x : {i, right(i), left(i)} )
+                {
+                    for ( auto n_y : {j, right(j), left(j)} ) 
+                    {
+                        for ( auto n_z : {k, up(k), down(k)} ) 
+                        {
+                            Index = i + j*CellNumbers[0] + k*CellNumbers[0]*CellNumbers[1];
+                            NeighbourIndex = n_x +  n_y*CellNumbers[0] + n_z*CellNumbers[0]*CellNumbers[1];
+                            CellNeighbourIndices[Index].emplace_back( NeighbourIndex );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return {CellList, CellNeighbourIndices};
+}
 
 
 //
@@ -136,8 +215,10 @@ void Topology::sort()
     
     std::size_t counterMolecules = 0;
     std::size_t counterAtoms = 0;
+    
     for( auto& m: data )
-    {
+    {   
+        //cout<<"aaah" << m << endl;
         // renumber molecules
         ++ counterMolecules;
         // check if this is a newly reacted molecule

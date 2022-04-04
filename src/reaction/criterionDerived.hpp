@@ -16,6 +16,35 @@
 
 #include <cassert>
 
+
+// 
+// zone criterion
+//
+class CriterionZone
+    : public CriterionBase
+{
+  protected: 
+    //
+    // clone_impl(): the actual implementation of the clone() functionality
+    // --> supposed to be implemented in the derived classes in order to 
+    // guarantee correct deep-copying / cloning of objects 
+    //
+    virtual CriterionZone* clone_impl() const override
+    {
+        return new CriterionZone(*this); 
+    }
+
+  public:
+    virtual std::string getType() const override { return "zone"; }
+
+    bool valid(const std::vector<Molecule>& reactants, const REALVEC& boxDimensions)
+    {
+
+        latestValue = reactants[data[0].first](data[0].second).position(2);
+        return ( (latestValue >= minValue && latestValue <= maxValue) ? true : false );
+    }
+};
+
 // 
 // distance criterion
 //

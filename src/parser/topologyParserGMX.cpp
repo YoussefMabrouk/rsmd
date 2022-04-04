@@ -214,6 +214,7 @@ void TopologyParserGMX::read_gro( const std::string& groFile, Topology& top )
         REALVEC box;
         tmpstream >> box(0) >> box(1) >> box(2);
         top.setDimensions(box);
+        top.setCellNumbers();
 
 	}
 	

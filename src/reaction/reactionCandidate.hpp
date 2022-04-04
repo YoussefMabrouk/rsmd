@@ -76,12 +76,14 @@ class ReactionCandidate
     //
     // check validity of all criterions
     //
-    bool valid(const REALVEC&);
+    bool valid(const REALVEC&, int criterion_number);
 
     //
     // write to stream - short version
     //
     std::string shortInfo() const;
+    
+    std::string reaction_name() const;
 
 };
 

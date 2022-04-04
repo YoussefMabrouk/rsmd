@@ -29,13 +29,15 @@ REAL ReactionCandidate::getCurrentReactionRateValue() const
     // the fact that it is a "distance" criterion is never checked, 
     // but how to assure that it is the 'correct' one?
     // --> add notes for users ...
-    REAL currentDistanceValue = criterions[0]->getLatest(); 
-    REAL currentRateValue = reactionRate[0].second;    
-    for( const auto& pair: reactionRate )
-    {
-        if( pair.first > currentDistanceValue )    break;
-        currentRateValue = pair.second;
-    }
+    //REAL currentDistanceValue = criterions[0]->getLatest(); 
+    //REAL currentRateValue = reactionRate[0].second;    
+    //for( const auto& pair: reactionRate )
+    //{
+    //    if( pair.first > currentDistanceValue )    break;
+    //    currentRateValue = pair.second;
+    //}
+    
+    REAL currentRateValue = reactionRate[0].second;
     return currentRateValue;
 }
 
@@ -44,10 +46,10 @@ REAL ReactionCandidate::getCurrentReactionRateValue() const
 // get current distance value
 // (for first distance criterion)
 //
-REAL ReactionCandidate::getCurrentDistanceValue() const
-{
-    return criterions[0]->getLatest();
-}
+//REAL ReactionCandidate::getCurrentDistanceValue() const
+//{
+//    return criterions[0]->getLatest();
+//}
 
 
 // 
@@ -129,32 +131,46 @@ void ReactionCandidate::applyTranslations()
     }
 }
 
-
-
-//
-// check validity of all criterions
-//
-bool ReactionCandidate::valid(const REALVEC& boxDimensions)
+bool ReactionCandidate::valid(const REALVEC& boxDimensions, int criterion_step)
 {
-    rsmdDEBUG("checking validity of all criterions ...");
+    std::vector<std::vector<int>> candidate_ids {};
+    std::vector<int> reactmolids {};
+    int i;
+    
+    candidate_ids.push_back( {criterion_step} );
+    for (i=0; i<criterion_step; i++)
+    {
+        candidate_ids.push_back ( {i, criterion_step} );
+        candidate_ids.push_back ( {criterion_step, i} );
+    }
     for( const auto& criterion: criterions )
     {
-        rsmdDEBUG(*criterion);
-        if( ! criterion->valid(reactants, boxDimensions) )
+        reactmolids = {};
+        for(const auto& ixPair: *criterion)
         {
-            rsmdDEBUG( "... INVALID: " << criterion->getLatest() << " not in [" << criterion->getMin() << ", " << criterion->getMax() << "]" );
-            rsmdDEBUG( "... skipping any further criterions" );
-            rsmdDEBUG(" ");
-            return false;
-        } 
-        rsmdDEBUG( "... VALID: " << criterion->getLatest() << " is in [" << criterion->getMin() << ", " << criterion->getMax() << "]" )
-            
+           reactmolids.push_back (ixPair.first);
+           rsmdDEBUG(ixPair.first);
+        }
+        for (i=0; i<candidate_ids.size(); i++)
+        {
+            if ( reactmolids == candidate_ids[i])
+            {
+                rsmdDEBUG(*criterion);
+                if( ! criterion->valid(reactants, boxDimensions) )
+                {
+                    rsmdDEBUG( "... INVALID: " << criterion->getLatest() << " not in [" << criterion->getMin() << ", " << criterion->getMax() << "]" );
+                    rsmdDEBUG( "... skipping any further criterions" );
+                    rsmdDEBUG(" ");
+                    return false;
+                } 
+                        rsmdDEBUG( "... VALID: " << criterion->getLatest() << " is in [" << criterion->getMin() << ", " << criterion->getMax() << "]" )
+            }
+        }
     }
     rsmdDEBUG( "... all criterions are valid!" );
     rsmdDEBUG(" ");
     return true;
 }
-
 
 
 //
@@ -183,6 +199,13 @@ std::string ReactionCandidate::shortInfo() const
     }
     stream << ">";
 
+    return stream.str();
+}
+
+std::string ReactionCandidate::reaction_name() const
+{
+    std::stringstream stream;
+    stream << name;
     return stream.str();
 }
 

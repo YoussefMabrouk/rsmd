@@ -10,6 +10,9 @@
 */
 
 #include "reactionBase.hpp"
+#include <iostream>
+#include <cmath>
+using namespace std;
 
 //
 // copy constructor
@@ -83,7 +86,13 @@ void ReactionBase::addTransition(const std::size_t& oldMolix, const std::size_t&
 void ReactionBase::addCriterion(const std::vector<std::pair<std::size_t, std::size_t>>& ixList, const std::pair<REAL, REAL>& thresholds) 
 { 
     auto it = criterions.end();
-    if( ixList.size() == 2 )
+
+    if( ixList.size() == 1 )
+    {
+        //cout<<"aha"  << endl;
+        it = criterions.emplace( std::end(criterions), std::make_unique<CriterionZone>() );
+    }
+    else if( ixList.size() == 2 )
     {
         it = criterions.emplace( std::end(criterions), std::make_unique<CriterionDistance>() );
     }
@@ -97,6 +106,7 @@ void ReactionBase::addCriterion(const std::vector<std::pair<std::size_t, std::si
     }
     else
     {
+        //cout<<ixList.size()  << endl;
         rsmdCRITICAL("no criterion involving more than 4 atoms has been implemented yet");
     }
 
@@ -133,10 +143,10 @@ void ReactionBase::consistencyCheck() const
         rsmdEXIT( "error in input: no product molecule was found" );
     }
     // check for distance criterion
-    if( criterions[0]->getType() != "distance" )
-    {
-        rsmdEXIT( "error in input: the first listed criterion needs to be a distance" );
-    }
+    //if( criterions[0]->getType() != "distance" )
+    //{
+    //    rsmdEXIT( "error in input: the first listed criterion needs to be a distance" );
+    //}
     // check for consistency within reactants/products/transitionTables
     for( const auto& tt: transitionTables )
     {

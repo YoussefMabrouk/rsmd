@@ -113,6 +113,9 @@ class ReactionBase
     const auto&         getReactants()      const { return reactants; }
     auto&               getReactants()            { return reactants; }
 
+    const auto&         getCriterions()      const { return criterions; }
+    auto&               getCriterions()            { return criterions; }
+
     const auto          getProduct(const std::size_t&) const;
     const auto&         getProducts()       const { return products; }
     auto&               getProducts()             { return products; }

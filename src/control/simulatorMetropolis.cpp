@@ -49,7 +49,7 @@ void SimulatorMetropolis::reactiveStep()
 {
     // search for candidates
     universe.update(lastReactiveCycle);
-    auto candidates = universe.searchReactionCandidates(); // returns shuffled vector of reaction candidates
+    auto candidates = universe.CellSearchReactionCandidates(); //searchReactionCandidates(); // returns shuffled vector of reaction candidates
     STATISTICS_FILE << std::setw(10) << currentCycle << std::setw(15) << candidates.size();
     if( candidates.size() > 0 )
     {

@@ -10,7 +10,11 @@
 */
 
 #include "container/universe.hpp"
-
+#include "container/topology.hpp"
+#include <iostream>
+#include <cmath>
+#include <math.h>
+using namespace std;
 //
 // initial setup of the universe
 //
@@ -78,7 +82,6 @@ void Universe::update(const std::size_t& cycle)
     topologyOld.clear();
     topologyNew.clear();
     topologyRelaxed.clear();
-
     topologyParser->read(topologyOld, cycle);
     topologyOld.clearReactionRecords();
     topologyNew = topologyOld;
@@ -227,78 +230,255 @@ void Universe::react(ReactionCandidate& candidate)
     }
 }
 
+//cell list 
+std::tuple<std::vector<std::reference_wrapper<Molecule>>, std::vector<int>> Universe::CellNeighbours(int CellIndex , std::string molname)
+{   
+    std::vector<std::reference_wrapper<Molecule>> molReferences {};
+    std::vector<int> molCells {};
+    Molecule molecule;    
+    int i, j, Index;
 
-//
-// search for reaction candidates
-//
-std::vector<ReactionCandidate> Universe::searchReactionCandidates()
-{
-    // search for possible reaction candidates and return them if they match all criteria
-    std::vector<ReactionCandidate> reactionCandidates {};
-
-    for( auto& reactionTemplate: reactionTemplates )
+    for (i= 0 ; i < CellNeighbourIndices[CellIndex].size(); i++)
     {
-        if( reactionTemplate.getReactants().size() == 1 )
+      Index = CellNeighbourIndices[CellIndex][i];
+      for(j = 0 ; j < CellList[Index].size(); j++)
+      {
+        molecule = CellList[Index][j];
+        if( molecule.getName() == molname )  
         {
-            for( auto& reactant: topologyOld.getMolecules( reactionTemplate.getReactants()[0].getName() ) )
-            {
-                rsmdDEBUG( "checking reaction candidate: " << reactant.get().getName() << ", " << reactant.get().getID() );
-                reactionCandidates.push_back( reactionTemplate );
-                reactionCandidates.back().updateReactant( 0, reactant.get() );
-                if( ! reactionCandidates.back().valid(topologyOld.getDimensions()) ) reactionCandidates.pop_back();
-            }
+            molReferences.emplace_back( CellList[Index][j] );
+            molCells.emplace_back( Index );
         }
-        else if( reactionTemplate.getReactants().size() == 2 )
-        {
-            for( auto& reactant1: topologyOld.getMolecules( reactionTemplate.getReactants()[0].getName() ) )
-            {
-                for( auto& reactant2: topologyOld.getMolecules( reactionTemplate.getReactants()[1].getName() ) )
-                {
-                    if( reactant1.get() == reactant2.get() ) continue;
-                    if( reactant1.get().getName() == reactant2.get().getName() && reactant1.get().getID() > reactant2.get().getID() ) continue;
-                    rsmdDEBUG( "checking reaction candidate: " << reactant1.get().getName() << ", " << reactant1.get().getID() << " + " << reactant2.get().getName() << ", " << reactant2.get().getID() );
-                    reactionCandidates.push_back( reactionTemplate );
-                    reactionCandidates.back().updateReactant( 0, reactant1.get() );
-                    reactionCandidates.back().updateReactant( 1, reactant2.get() );
-                    if( ! reactionCandidates.back().valid(topologyOld.getDimensions()) )   reactionCandidates.pop_back();
-
-                }
-            }
-        }
-        else if( reactionTemplate.getReactants().size() == 3 )
-        {
-            for( auto& reactant1: topologyOld.getMolecules( reactionTemplate.getReactants()[0].getName() ) )
-            {
-                for( auto& reactant2: topologyOld.getMolecules( reactionTemplate.getReactants()[1].getName() ) )
-                {
-                    if( reactant1.get() == reactant2.get() ) continue;
-                    if( reactant1.get().getName() == reactant2.get().getName() && reactant1.get().getID() > reactant2.get().getID() ) continue; 
-                    for( auto& reactant3: topologyOld.getMolecules( reactionTemplate.getReactants()[2].getName() ) )
-                    {
-                        if( reactant1.get() == reactant3.get() || reactant2.get() == reactant3.get() )  continue;
-                        if( reactant2.get().getName() == reactant3.get().getName() && reactant2.get().getID() > reactant3.get().getID() ) continue;
-                        rsmdDEBUG( "checking reaction candidate: " << reactant1.get().getName() << ", " << reactant1.get().getID() 
-                                                          << " + " << reactant2.get().getName() << ", " << reactant2.get().getID() 
-                                                          << " + " << reactant3.get().getName() << ", " << reactant3.get().getID() );
-                        reactionCandidates.push_back( reactionTemplate );
-                        reactionCandidates.back().updateReactant( 0, reactant1.get() );
-                        reactionCandidates.back().updateReactant( 1, reactant2.get() );
-                        reactionCandidates.back().updateReactant( 2, reactant3.get() );
-                        if( ! reactionCandidates.back().valid(topologyOld.getDimensions()) )   reactionCandidates.pop_back();
-                    }
-                }
-            }
-        }
-        else
-        {
-            rsmdCRITICAL("attention: more than 3 reactants per reaction is currently not implemented!");
-        }
-        
+      } 
     }
+    return {molReferences, molCells};
+}
 
-    // shuffle candidates
-    enhance::shuffle(reactionCandidates.begin(), reactionCandidates.end());
+std::vector<std::reference_wrapper<Molecule>> Universe::Cell(int CellIndex , std::string molname)
+{   
+    std::vector<std::reference_wrapper<Molecule>> molReferences {};
+    Molecule molecule;   
+    int j;
+    
+    for(j = 0 ; j < CellList[CellIndex].size(); j++)
+    {
+        molecule = CellList[CellIndex][j];
+        if( molecule.getName() == molname )  molReferences.emplace_back( CellList[CellIndex][j] );
+    }
+    return molReferences;
+}
 
+std::vector<ReactionCandidate> Universe::CellSearchReactionCandidates()
+{
+    int i, CellIndex;
+    std::vector<ReactionCandidate> reactionCandidates {};
+    std::vector<double> reactionRates {};
+    auto [x, y] = topologyOld.getCellList();
+    CellList = x;
+    CellNeighbourIndices = y;
+    for(CellIndex = 0; CellIndex < CellList.size();CellIndex++)
+    {
+        for( auto& candidate: CellReactionCandidates ( CellIndex ))
+        {
+            reactionCandidates.push_back (candidate);
+        }
+    }
+    //for(i = 0 ; i < reactionCandidates.size();i++)
+    //{
+    //    reactionRates.push_back(reactionCandidates[i].getCurrentReactionRateValue());
+    //}
+    enhance::weighted_shuffle(reactionCandidates.begin(), reactionCandidates.end(), reactionRates.begin(), reactionRates.end());
+    
     return reactionCandidates;
 }
 
+std::vector<ReactionCandidate> Universe::CellReactionCandidates(int CellIndex)
+{
+    // search for possible reaction candidates and return them if they match all criteria
+    std::vector<ReactionCandidate> reactionCandidates {};
+    std::vector<std::reference_wrapper<Molecule>> reactants1;
+    std::vector<std::reference_wrapper<Molecule>> reactants2;
+    std::vector<std::reference_wrapper<Molecule>> reactants3;
+    std::vector<std::reference_wrapper<Molecule>> reactants4;
+    std::vector<int> CellIndex2, CellIndex3, CellIndex4;
+    Molecule reactant1;
+    Molecule reactant2;
+    Molecule reactant3;
+    Molecule reactant4;
+    int i, j, k, l, cellindex1, cellindex2, cellindex3, cellindex4;
+    
+    for( auto& reactionTemplate: reactionTemplates )
+    {
+        if( reactionTemplate.getReactants().size() == 2 )
+        {            
+            reactants1 = Cell(CellIndex, reactionTemplate.getReactants()[0].getName() );
+            for(i = 0 ; i < reactants1.size();i++)
+            {
+              reactant1 = reactants1[i];
+              reactionCandidates.push_back( reactionTemplate );
+              reactionCandidates.back().updateReactant( 0, reactant1 );
+              rsmdDEBUG( "checking reaction candidate: " << reactant1.getName() << ", " << reactant1.getID() );
+              if( reactionCandidates.back().valid(topologyOld.getDimensions(), 0) )
+              {
+                  reactionCandidates.pop_back();
+                  auto [reactants2, CellIndex2] = CellNeighbours(CellIndex, reactionTemplate.getReactants()[1].getName() );
+                  for(j = 0 ; j < reactants2.size();j++)
+                  {
+                      reactant2 = reactants2[j];
+                      if( reactant1.getID() == reactant2.getID() ) continue;
+                      if( reactant1.getName() == reactant2.getName() && reactant1.getID() > reactant2.getID() ) continue;
+                      rsmdDEBUG( "checking reaction candidate: " << reactant2.getName() << ", " << reactant2.getID() );
+                      reactionCandidates.push_back( reactionTemplate );
+                      reactionCandidates.back().updateReactant( 0, reactant1 );
+                      reactionCandidates.back().updateReactant( 1, reactant2 );
+                      if( ! reactionCandidates.back().valid(topologyOld.getDimensions(), 1) ) reactionCandidates.pop_back();
+                  }
+              }
+              else
+              {
+                reactionCandidates.pop_back();  
+              }
+            }
+        }         
+        else if( reactionTemplate.getReactants().size() == 3 )
+        {
+            reactants1 = Cell(CellIndex, reactionTemplate.getReactants()[0].getName() );
+            for(i = 0 ; i < reactants1.size();i++)
+            {
+              reactant1 = reactants1[i];
+              reactionCandidates.push_back( reactionTemplate );
+              reactionCandidates.back().updateReactant( 0, reactant1 );
+              rsmdDEBUG( "checking reaction candidate: " << reactant1.getName() << ", " << reactant1.getID() );
+              if ( reactionCandidates.back().valid(topologyOld.getDimensions(), 0))
+              {
+                  reactionCandidates.pop_back();
+                  auto [reactants2, CellIndex2] = CellNeighbours(CellIndex, reactionTemplate.getReactants()[1].getName() );
+                  for(j = 0 ; j < reactants2.size();j++)
+                  {
+                      reactant2 = reactants2[j];
+                      if( reactant1.getID() == reactant2.getID() ) continue;
+                      if( reactant1.getName() == reactant2.getName() && reactant1.getID() > reactant2.getID() ) continue;
+                      rsmdDEBUG( "checking reaction candidate: " << reactant2.getName() << ", " << reactant2.getID() );
+                      reactionCandidates.push_back( reactionTemplate );
+                      reactionCandidates.back().updateReactant( 0, reactant1 );
+                      reactionCandidates.back().updateReactant( 1, reactant2 );
+                      if( reactionCandidates.back().valid(topologyOld.getDimensions(), 1) )
+                      {
+                          reactionCandidates.pop_back();
+                          auto [reactants3, CellIndex3] = CellNeighbours(CellIndex, reactionTemplate.getReactants()[2].getName() );
+                          for(k = 0 ; k < reactants3.size();j++)
+                          {
+                             reactant3 = reactants3[k]
+                             if( reactant1.getID() == reactant3.getID() | reactant2.getID() == reactant3.getID() ) continue;
+                             if( reactant1.getName() == reactant3.getName() && reactant1.getID() > reactant3.getID() ) continue;
+                             if( reactant2.getName() == reactant3.getName() && reactant2.getID() > reactant3.getID() ) continue;
+                             reactionCandidates.push_back( reactionTemplate );
+                             reactionCandidates.back().updateReactant( 0, reactant1 );
+                             reactionCandidates.back().updateReactant( 1, reactant2 );                                             
+                             reactionCandidates.back().updateReactant( 2, reactant3 );
+                             if( ! reactionCandidates.back().valid(topologyOld.getDimensions(), 2) ) reactionCandidates.pop_back();
+                          }
+                       }
+                       else
+                       {
+                         reactionCandidates.pop_back();
+                       }                               
+                  }
+              }
+              else
+              {
+                  reactionCandidates.pop_back();
+              }
+            }
+         }        
+        if( reactionTemplate.getReactants().size() == 4 )
+        {
+            reactants1 = Cell(CellIndex, reactionTemplate.getReactants()[0].getName() );
+            for(i = 0 ; i < reactants1.size();i++)
+            {
+              reactant1 = reactants1[i];
+              cellindex1 = CellIndex;
+              reactionCandidates.push_back( reactionTemplate );
+              reactionCandidates.back().updateReactant( 0, reactant1 );
+              rsmdDEBUG( "checking reaction candidate: " << reactant1.getName() << ", " << reactant1.getID() );
+              if ( reactionCandidates.back().valid(topologyOld.getDimensions(), 0))
+              {
+                  reactionCandidates.pop_back();
+                  auto [reactants2, CellIndex2] = CellNeighbours(CellIndex, reactionTemplate.getReactants()[1].getName() );
+                  for(j = 0 ; j < reactants2.size();j++)
+                  {
+                      reactant2 = reactants2[j];
+                      cellindex2 = CellIndex2[j];
+                      if( reactant1.getID() == reactant2.getID() ) continue;
+                      if( reactant1.getName() == reactant2.getName() && reactant1.getID() > reactant2.getID() ) continue;   
+                      if( reactant1.getName() == reactant2.getName() && cellindex1 > cellindex2 ) continue;
+                      rsmdDEBUG( "checking reaction candidate: " << reactant2.getName() << ", " << reactant2.getID() );
+                      reactionCandidates.push_back( reactionTemplate );
+                      reactionCandidates.back().updateReactant( 0, reactant1 );
+                      reactionCandidates.back().updateReactant( 1, reactant2 );
+                      if( reactionCandidates.back().valid(topologyOld.getDimensions(), 1) )
+                      {
+                          reactionCandidates.pop_back();
+                          auto [reactants3, CellIndex3] = CellNeighbours(CellIndex, reactionTemplate.getReactants()[2].getName() );
+                          for (k = 0 ; k < reactants3.size();k++)
+                          {
+                              reactant3 = reactants3[k];
+                              cellindex3 = CellIndex3[k];
+                              if( reactant1.getID() == reactant3.getID() || reactant2.getID() == reactant3.getID() )  continue;
+                              if( reactant1.getName() == reactant3.getName() && reactant1.getID() > reactant3.getID() ) continue;
+                              if( reactant1.getName() == reactant3.getName() && cellindex1 > cellindex3 ) continue;
+                              if( reactant2.getName() == reactant3.getName() && reactant2.getID() > reactant3.getID() ) continue;
+                              if( reactant2.getName() == reactant3.getName() && cellindex2 > cellindex3 ) continue;
+                              rsmdDEBUG( "checking reaction candidate: " << reactant3.getName() << ", " << reactant3.getID() );
+                              reactionCandidates.push_back( reactionTemplate );
+                              reactionCandidates.back().updateReactant( 0, reactant1 );
+                              reactionCandidates.back().updateReactant( 1, reactant2 );                                             
+                              reactionCandidates.back().updateReactant( 2, reactant3 );
+                              if( reactionCandidates.back().valid(topologyOld.getDimensions(), 2) )
+                              {
+                                  reactionCandidates.pop_back(); 
+                                  auto [reactants4, CellIndex4] = CellNeighbours(CellIndex, reactionTemplate.getReactants()[3].getName() );
+                                  for (l = 0 ; l < reactants4.size();l++)
+                                  {
+                                      reactant4 = reactants4[l];
+                                      cellindex4 = CellIndex4[l];
+                                      if( reactant1.getID() == reactant4.getID() || reactant2.getID() == reactant4.getID() || reactant3.getID() == reactant4.getID() )  continue;
+                                      if( reactant1.getName() == reactant4.getName() && reactant1.getID() > reactant4.getID() ) continue;
+                                      if( reactant1.getName() == reactant4.getName() && cellindex1 > cellindex4 ) continue;
+                                      if( reactant2.getName() == reactant4.getName() && reactant2.getID() > reactant4.getID() ) continue;
+                                      if( reactant2.getName() == reactant4.getName() && cellindex2 > cellindex4 ) continue;
+                                      if( reactant3.getName() == reactant4.getName() && reactant3.getID() > reactant4.getID() ) continue;
+                                      if( reactant3.getName() == reactant4.getName() && cellindex3 > cellindex4 ) continue;
+                                      rsmdDEBUG( "checking reaction candidate: " << reactant4.getName() << ", " << reactant4.getID() );
+                                      reactionCandidates.push_back( reactionTemplate );
+                                      reactionCandidates.back().updateReactant( 0, reactant1 );
+                                      reactionCandidates.back().updateReactant( 1, reactant2 );
+                                      reactionCandidates.back().updateReactant( 2, reactant3 );
+                                      reactionCandidates.back().updateReactant( 3, reactant4 );
+                                      if( ! reactionCandidates.back().valid(topologyOld.getDimensions(), 3) ) reactionCandidates.pop_back();
+                                  }
+                              }
+                              else
+                              {
+                                  reactionCandidates.pop_back();
+                              }
+                          }    
+                      }
+                      else
+                      {
+                          reactionCandidates.pop_back();
+                      }
+                  }
+              }
+              else
+              {
+                  reactionCandidates.pop_back();
+              }
+            }
+        }       
+    }
+    
+    return reactionCandidates;
+}
+
+    

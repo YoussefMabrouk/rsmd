@@ -17,6 +17,8 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include <math.h>
+using namespace std;
 
 //
 // topology container
@@ -30,14 +32,16 @@ class Topology
     : public ContainerBase< std::vector<Molecule> >
 {
     REALVEC dimensions {0, 0, 0};
+    std::vector<int> CellNumbers {0, 0, 0};
     std::vector<std::pair<std::size_t, std::size_t>> reactedMoleculeRecords {};
     std::vector<std::pair<std::size_t, std::size_t>> reactedAtomRecords {};
-
+    
   public:
     //
     // getter/setter for dimensions
     //
     inline void        setDimensions(const REALVEC& d) { dimensions = d; }
+    inline void        setCellNumbers() { CellNumbers = {ceil(dimensions[0]), ceil(dimensions[1]), ceil(dimensions[2])}; }
     inline const auto& getDimensions()    const { return dimensions; }
 
     //
@@ -65,6 +69,11 @@ class Topology
         it->setName(name); 
         return it; 
     }
+    
+//    inline auto pushMolecule(Molecule m)    
+//    { 
+//        return data.emplace(end(), m); 
+//    }
 
     //
     // remove specific molecule(s)
@@ -83,6 +92,16 @@ class Topology
     //
     const Molecule& getMolecule(std::size_t) const;
     std::vector<std::reference_wrapper<Molecule>> getMolecules(std::string);
+    
+    //
+    //std::vector<std::reference_wrapper<Molecule>> Cell();
+    //std::vector<Topology> getCellList();   
+    std::tuple<std::vector<std::vector<std::reference_wrapper<Molecule>>>, std::vector<std::vector<int>>> getCellList();
+    int heaviside(int);
+    int right(int);
+    int left(int);
+    int up(int);
+    int down(int);
 
     // 
     // get specific molecule, create it if not yet existing
@@ -106,6 +125,7 @@ class Topology
     // sort topology, i.e. rearrange and renumber everything
     //
     void sort();
+    //void grid();
 
     //
     // repair molecule that is broken across periodic boundaries
@@ -120,7 +140,6 @@ class Topology
     { 
         return ( data.size() == 0 ? true : false ); 
     }
-
 
     //
     // clear topology
@@ -137,7 +156,7 @@ class Topology
         reactedMoleculeRecords.clear(); 
         reactedAtomRecords.clear(); 
     }
-
+    
     //
     // befriend << operator
     //

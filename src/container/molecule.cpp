@@ -22,6 +22,13 @@ const Atom& Molecule::getAtom(std::size_t id) const
     return std::cref(*it);
 }
 
+//const Atom& Molecule::getFirstAtom(std::size_t id) const
+//{
+//    Atom atom;
+//    auto it = std::find_if( begin(), end(), [&id](auto& a){ return a.id > 0.; } );
+//    return std::cref(*it);
+//}
+
 //
 // remove atoms from this molecule
 //

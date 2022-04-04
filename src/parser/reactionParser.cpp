@@ -10,6 +10,9 @@
 */
 
 #include "parser/reactionParser.hpp"
+#include <iostream>
+#include <cmath>
+using namespace std;
 
 //
 // read reaction from file
@@ -107,6 +110,16 @@ ReactionBase ReactionParser::read(const std::string& reactionFile)
                     REAL maxValue = 0;
                     linestream >> type;
                     
+                    if( type == "ZONE")
+                    {
+                        //cout<<"aaah"  << endl;
+                        for(int i=0; i<1; ++i)
+                        {
+                            linestream >> thisID.first >> thisID.second;
+                            atomIDs.push_back(thisID);
+                        }
+                        cout<<atomIDs.size()  << endl;
+                    }                    
                     if( type == "DIST" or type == "dist" or type == "Dist" )
                     {
                         for(int i=0; i<2; ++i)

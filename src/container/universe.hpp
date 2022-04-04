@@ -41,6 +41,12 @@ class Universe
     std::vector<ReactionBase> reactionTemplates {};
     
     std::unique_ptr<UnitSystem> unitSystem {nullptr};
+    
+    std::vector<std::vector<std::reference_wrapper<Molecule>>> CellList {};
+    std::vector<std::vector<int>> CellNeighbourIndices {};
+    std::vector<ReactionCandidate> CellReactionCandidates(int); 
+    std::tuple<std::vector<std::reference_wrapper<Molecule>>, std::vector<int>> CellNeighbours(int , std::string);
+    std::vector<std::reference_wrapper<Molecule>> Cell(int, std::string);    
 
     //
     // repair a molecule in case it is broken across periodic boundaries
@@ -71,7 +77,9 @@ class Universe
     //
     // search for reaction candidates
     //
-    std::vector<ReactionCandidate> searchReactionCandidates();
+    //std::vector<ReactionCandidate> searchReactionCandidates();
+    
+    std::vector<ReactionCandidate> CellSearchReactionCandidates();
 
     //
     // check availability of given candidate

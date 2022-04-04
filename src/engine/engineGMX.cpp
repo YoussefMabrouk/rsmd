@@ -389,10 +389,11 @@ void EngineGMX::grompp( const std::string& mdp, const std::string& top, const st
     execute( executablePath.c_str(), executablePath.c_str(), "grompp", 
             "-f", mdp.c_str(), 
             "-p", (top + ".top").c_str(), 
-            "-c", (gro + ".gro").c_str(), 
+            "-c", (gro + ".gro").c_str(),
+            "-r", (gro + ".gro").c_str(), 
             "-o", (tpr + ".tpr").c_str(), 
             "-po", (tpr + "-mdpout.mdp").c_str(), 
-            "-quiet", "-nocopyright", backupPolicy.c_str() );
+            "-maxwarn", "2");
 }
 
 //     grompp -f mdp.mdp -c gro.gro -p top.top -o tpr.tpr -n ndx.ndx
@@ -401,10 +402,11 @@ void EngineGMX::grompp( const std::string& mdp, const std::string& top, const st
     execute( executablePath.c_str(), executablePath.c_str(), "grompp", 
             "-f", mdp.c_str(), 
             "-p", (top + ".top").c_str(), 
-            "-c", (gro + ".gro").c_str(), 
+            "-c", (gro + ".gro").c_str(),
+            "-r", (gro + ".gro").c_str(),
             "-o", (tpr + ".tpr").c_str(), 
             "-n", (ndx + ".ndx").c_str(),
-            "-quiet", "-nocopyright", backupPolicy.c_str() );       
+            "-maxwarn", "2");       
 }
 
 //     convert-tpr -s tpr.tpr -o tpr_new.tpr -extend time
