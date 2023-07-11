@@ -1,0 +1,77 @@
+\hypertarget{classSimulatorBase}{}\section{Simulator\+Base Class Reference}
+\label{classSimulatorBase}\index{Simulator\+Base@{Simulator\+Base}}
+Inheritance diagram for Simulator\+Base\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classSimulatorBase}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classSimulatorBase_a5f4de392eb878221ee6659e0ba74f872}\label{classSimulatorBase_a5f4de392eb878221ee6659e0ba74f872}} 
+void {\bfseries run} ()
+\item 
+\mbox{\Hypertarget{classSimulatorBase_abf93602f7d449518be2bdbe1587a660e}\label{classSimulatorBase_abf93602f7d449518be2bdbe1587a660e}} 
+void {\bfseries write\+Restart\+File} (const \mbox{\hyperlink{classParameters}{Parameters}} \&) const
+\item 
+\mbox{\Hypertarget{classSimulatorBase_ab62968759e46cac079187d96b4e581a1}\label{classSimulatorBase_ab62968759e46cac079187d96b4e581a1}} 
+virtual void {\bfseries setup} (const \mbox{\hyperlink{classParameters}{Parameters}} \&)
+\item 
+\mbox{\Hypertarget{classSimulatorBase_a0fec722db46abb94bbf9446fd4064f89}\label{classSimulatorBase_a0fec722db46abb94bbf9446fd4064f89}} 
+virtual void {\bfseries finish} ()=0
+\item 
+\mbox{\Hypertarget{classSimulatorBase_a7d89155f2b293deebd6eaf79ba1bb76d}\label{classSimulatorBase_a7d89155f2b293deebd6eaf79ba1bb76d}} 
+auto {\bfseries get\+N\+Cycles} () const
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classSimulatorBase_a92300915ac3d7c0812f5390068a2c23d}\label{classSimulatorBase_a92300915ac3d7c0812f5390068a2c23d}} 
+void {\bfseries md\+Sequence} ()
+\item 
+\mbox{\Hypertarget{classSimulatorBase_af463a10b1c1c8c2df0b46e87f3d3dfac}\label{classSimulatorBase_af463a10b1c1c8c2df0b46e87f3d3dfac}} 
+virtual void {\bfseries reactive\+Step} ()=0
+\item 
+\mbox{\Hypertarget{classSimulatorBase_a0fcd514966117c48c810137e0177009c}\label{classSimulatorBase_a0fcd514966117c48c810137e0177009c}} 
+virtual bool {\bfseries acceptance} (const \mbox{\hyperlink{classReactionCandidate}{Reaction\+Candidate}} \&)=0
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classSimulatorBase_a5265c38f77e3fe7f04f02ec446c5220c}\label{classSimulatorBase_a5265c38f77e3fe7f04f02ec446c5220c}} 
+\mbox{\hyperlink{classUniverse}{Universe}} {\bfseries universe} \{\}
+\item 
+\mbox{\Hypertarget{classSimulatorBase_ae53ac9ac72ac434790a8a19bd1828736}\label{classSimulatorBase_ae53ac9ac72ac434790a8a19bd1828736}} 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classEngineBase}{Engine\+Base}} $>$ {\bfseries md\+Engine} \{nullptr\}
+\item 
+\mbox{\Hypertarget{classSimulatorBase_a8b8f6b77a9c22a1e7ce1435630f02c1d}\label{classSimulatorBase_a8b8f6b77a9c22a1e7ce1435630f02c1d}} 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classEnergyParserBase}{Energy\+Parser\+Base}} $>$ {\bfseries energy\+Parser} \{nullptr\}
+\item 
+\mbox{\Hypertarget{classSimulatorBase_a22462f697da07f752655b159a7a141c4}\label{classSimulatorBase_a22462f697da07f752655b159a7a141c4}} 
+std\+::size\+\_\+t {\bfseries current\+Cycle} \{1\}
+\item 
+\mbox{\Hypertarget{classSimulatorBase_ac2c917546aa340421e42a5f507a22738}\label{classSimulatorBase_ac2c917546aa340421e42a5f507a22738}} 
+std\+::size\+\_\+t {\bfseries last\+Reactive\+Cycle} \{0\}
+\item 
+\mbox{\Hypertarget{classSimulatorBase_a7d76f2a536a62995de4e840e0c0d38c1}\label{classSimulatorBase_a7d76f2a536a62995de4e840e0c0d38c1}} 
+std\+::size\+\_\+t {\bfseries n\+Cycles} \{0\}
+\item 
+\mbox{\Hypertarget{classSimulatorBase_a7c9bab92a603498956738f4dc43b85aa}\label{classSimulatorBase_a7c9bab92a603498956738f4dc43b85aa}} 
+std\+::size\+\_\+t {\bfseries n\+Cycles\+Completed} \{0\}
+\item 
+\mbox{\Hypertarget{classSimulatorBase_aa8d5f5255226a0cf4bac1e8fd019b221}\label{classSimulatorBase_aa8d5f5255226a0cf4bac1e8fd019b221}} 
+bool {\bfseries write\+Statistics} \{false\}
+\item 
+\mbox{\Hypertarget{classSimulatorBase_a95f485d999dfb1ab7035ac1b8182ac45}\label{classSimulatorBase_a95f485d999dfb1ab7035ac1b8182ac45}} 
+std\+::ofstream {\bfseries S\+T\+A\+T\+I\+S\+T\+I\+C\+S\+\_\+\+F\+I\+LE} \{\}
+\item 
+\mbox{\Hypertarget{classSimulatorBase_ad74e023d1e506d6d95af9f0d215d2cdb}\label{classSimulatorBase_ad74e023d1e506d6d95af9f0d215d2cdb}} 
+std\+::unique\+\_\+ptr$<$ Unit\+System $>$ {\bfseries unit\+System} \{nullptr\}
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+control/simulator\+Base.\+hpp\item 
+control/simulator\+Base.\+cpp\end{DoxyCompactItemize}

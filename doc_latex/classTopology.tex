@@ -1,0 +1,90 @@
+\hypertarget{classTopology}{}\section{Topology Class Reference}
+\label{classTopology}\index{Topology@{Topology}}
+Inheritance diagram for Topology\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classTopology}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classTopology_a43e08a71c5c230a3b80a2254bb7590dd}\label{classTopology_a43e08a71c5c230a3b80a2254bb7590dd}} 
+void {\bfseries set\+Dimensions} (const R\+E\+A\+L\+V\+EC \&d)
+\item 
+\mbox{\Hypertarget{classTopology_a00fe36f612b0f115f0c8021b846c4bf6}\label{classTopology_a00fe36f612b0f115f0c8021b846c4bf6}} 
+const auto \& {\bfseries get\+Dimensions} () const
+\item 
+\mbox{\Hypertarget{classTopology_ae63fd2235cbe695a3d8fd447efba931d}\label{classTopology_ae63fd2235cbe695a3d8fd447efba931d}} 
+void {\bfseries add\+Reaction\+Record} (const std\+::size\+\_\+t \&molid)
+\item 
+\mbox{\Hypertarget{classTopology_a7bb2878be1add1b4b27750966d561eae}\label{classTopology_a7bb2878be1add1b4b27750966d561eae}} 
+const auto \& {\bfseries get\+Reaction\+Records\+Atoms} ()
+\item 
+\mbox{\Hypertarget{classTopology_a257fce4a1dd8785861a001fca1847d4e}\label{classTopology_a257fce4a1dd8785861a001fca1847d4e}} 
+const auto \& {\bfseries get\+Reaction\+Records\+Molecules} ()
+\item 
+\mbox{\Hypertarget{classTopology_a4bca05cee9589ad00b18d92c67646bea}\label{classTopology_a4bca05cee9589ad00b18d92c67646bea}} 
+const std\+::size\+\_\+t \& {\bfseries get\+Reaction\+Record\+Molecule} (const std\+::size\+\_\+t \&oldmolid)
+\item 
+\mbox{\Hypertarget{classTopology_a5a99967e344fd10de5c61bc4839f4681}\label{classTopology_a5a99967e344fd10de5c61bc4839f4681}} 
+auto {\bfseries add\+Molecule} (\mbox{\hyperlink{classMolecule}{Molecule}} m)
+\item 
+\mbox{\Hypertarget{classTopology_a13905ac1030de2330788a80b3ba10adc}\label{classTopology_a13905ac1030de2330788a80b3ba10adc}} 
+auto {\bfseries add\+Molecule} (std\+::size\+\_\+t id, std\+::string name)
+\item 
+\mbox{\Hypertarget{classTopology_adf853f3c5e1faaa520945fa4d8636cb7}\label{classTopology_adf853f3c5e1faaa520945fa4d8636cb7}} 
+void {\bfseries remove\+Molecule} (\mbox{\hyperlink{classMolecule}{Molecule}} \&)
+\item 
+\mbox{\Hypertarget{classTopology_a43bde0718e4d50ccfd96ef7d55ee9511}\label{classTopology_a43bde0718e4d50ccfd96ef7d55ee9511}} 
+void {\bfseries remove\+Molecule} (std\+::size\+\_\+t)
+\item 
+\mbox{\Hypertarget{classTopology_ae75e30fd331e67182af3de9f7561260a}\label{classTopology_ae75e30fd331e67182af3de9f7561260a}} 
+bool {\bfseries contains\+Molecule} (const \mbox{\hyperlink{classMolecule}{Molecule}} \&) const
+\item 
+\mbox{\Hypertarget{classTopology_a5bffe8e0a383173f10e447c95fdaef9e}\label{classTopology_a5bffe8e0a383173f10e447c95fdaef9e}} 
+bool {\bfseries contains\+Molecule} (const std\+::size\+\_\+t \&) const
+\item 
+\mbox{\Hypertarget{classTopology_a24590a20d20d07d4807d1e28da3c55e5}\label{classTopology_a24590a20d20d07d4807d1e28da3c55e5}} 
+const \mbox{\hyperlink{classMolecule}{Molecule}} \& {\bfseries get\+Molecule} (std\+::size\+\_\+t) const
+\item 
+\mbox{\Hypertarget{classTopology_a9f3a2f9b847f89d5bbfd214d96391e77}\label{classTopology_a9f3a2f9b847f89d5bbfd214d96391e77}} 
+std\+::vector$<$ std\+::reference\+\_\+wrapper$<$ \mbox{\hyperlink{classMolecule}{Molecule}} $>$ $>$ {\bfseries get\+Molecules} (std\+::string)
+\item 
+\mbox{\Hypertarget{classTopology_a53c46d18870e7610f73024504ff1ebcd}\label{classTopology_a53c46d18870e7610f73024504ff1ebcd}} 
+\mbox{\hyperlink{classMolecule}{Molecule}} \& {\bfseries get\+Add\+Molecule} (std\+::size\+\_\+t, std\+::string)
+\item 
+\mbox{\Hypertarget{classTopology_a57508c2466292d7f42b1b446a514ab70}\label{classTopology_a57508c2466292d7f42b1b446a514ab70}} 
+std\+::vector$<$ std\+::string $>$ {\bfseries get\+Moleculetypes} () const
+\item 
+\mbox{\Hypertarget{classTopology_ab26d60ea35ac26b9afb849e1390648e3}\label{classTopology_ab26d60ea35ac26b9afb849e1390648e3}} 
+const auto {\bfseries get\+N\+Atoms} () const
+\item 
+\mbox{\Hypertarget{classTopology_a7f61d561ac897adf0a9735ed66fa70b5}\label{classTopology_a7f61d561ac897adf0a9735ed66fa70b5}} 
+void {\bfseries sort} ()
+\item 
+\mbox{\Hypertarget{classTopology_a75a2d3933bc3af05e1ae0539b198d1a2}\label{classTopology_a75a2d3933bc3af05e1ae0539b198d1a2}} 
+void {\bfseries repair\+Molecule\+P\+BC} (\mbox{\hyperlink{classMolecule}{Molecule}} \&)
+\item 
+\mbox{\Hypertarget{classTopology_a785d0b5028f6f0c2d42fbb726c4ecc2c}\label{classTopology_a785d0b5028f6f0c2d42fbb726c4ecc2c}} 
+bool {\bfseries empty} () const
+\item 
+\mbox{\Hypertarget{classTopology_a156c05ef747fba350adc5f790a16367a}\label{classTopology_a156c05ef747fba350adc5f790a16367a}} 
+void {\bfseries clear} ()
+\item 
+\mbox{\Hypertarget{classTopology_aa549f8bec1377e04c677c24787d412ac}\label{classTopology_aa549f8bec1377e04c677c24787d412ac}} 
+void {\bfseries clear\+Reaction\+Records} ()
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classTopology_a6cd9eecf891bc3fcc4074b52de52c1fc}\label{classTopology_a6cd9eecf891bc3fcc4074b52de52c1fc}} 
+std\+::ostream \& {\bfseries operator$<$$<$} (std\+::ostream \&os, const \mbox{\hyperlink{classTopology}{Topology}} \&obj)
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+container/topology.\+hpp\item 
+container/topology.\+cpp\end{DoxyCompactItemize}
