@@ -22,3 +22,10 @@ EXTRACT_PRIVATE        = YES
 # Enable extracting documentation for locally defined classes and methods.
 EXTRACT_LOCAL_CLASSES  = YES
 EXTRACT_LOCAL_METHODS  = YES
+
+# Enable class and function dependency graphs
+UML_LOOK               = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+GRAPHICAL_HIERARCHY    = YES
+
