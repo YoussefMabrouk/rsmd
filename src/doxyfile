@@ -2,7 +2,6 @@
 
 # Project settings
 PROJECT_NAME           = rs@md
-PROJECT_NUMBER         =
 OUTPUT_LANGUAGE        = English
 RECURSIVE              = YES
 
