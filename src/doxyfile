@@ -5,22 +5,20 @@ PROJECT_NAME           = rs@md
 OUTPUT_LANGUAGE        = English
 RECURSIVE              = YES
 
-# Source code directory and files
+
+# Specify the file patterns for source code files.
 FILE_PATTERNS          = *.cpp *.h
 
-# Additional configuration options
+# Set GENERATE_HTML to YES to generate HTML output.
 GENERATE_HTML          = YES
-GENERATE_LATEX         = NO
-GENERATE_XML           = NO
+
+# Enable extracting documentation for all entities.
 EXTRACT_ALL            = YES
+
+# Enable extracting documentation for static and private members.
 EXTRACT_STATIC         = YES
 EXTRACT_PRIVATE        = YES
+
+# Enable extracting documentation for locally defined classes and methods.
 EXTRACT_LOCAL_CLASSES  = YES
 EXTRACT_LOCAL_METHODS  = YES
-HIDE_UNDOC_MEMBERS     = YES
-
-# Enable class and function dependency graphs
-UML_LOOK               = YES
-CALL_GRAPH             = YES
-CALLER_GRAPH           = YES
-GRAPHICAL_HIERARCHY    = YES
