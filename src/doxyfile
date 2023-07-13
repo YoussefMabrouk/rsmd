@@ -18,7 +18,6 @@ EXTRACT_PRIVATE        = YES
 EXTRACT_LOCAL_CLASSES  = YES
 EXTRACT_LOCAL_METHODS  = YES
 HIDE_UNDOC_MEMBERS     = YES
-HIERARCHY_TREE_ENABLED = YES
 
 # Enable class and function dependency graphs
 UML_LOOK               = YES
