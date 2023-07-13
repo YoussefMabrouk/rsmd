@@ -20,6 +20,8 @@ EXTRACT_LOCAL_METHODS  = YES
 HIDE_UNDOC_MEMBERS     = YES
 HIERARCHY_TREE_ENABLED = YES
 
-# Class grouping
-GROUPS_ENABLED         = YES
-GROUP_NAMES            = "Classes" "Modules"
+# Enable class and function dependency graphs
+UML_LOOK               = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+GRAPHICAL_HIERARCHY    = YES
